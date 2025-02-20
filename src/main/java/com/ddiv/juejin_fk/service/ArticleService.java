@@ -13,7 +13,7 @@ public interface ArticleService {
 
     Map<String,Object> getArticle(Integer articleId);
 
-    void updateArticle(Article article);
+    int updateArticle(Integer userId, Article article);
 
     void publishArticle(Integer articleId);
 
@@ -34,4 +34,6 @@ public interface ArticleService {
     Map<String, Object> getArticleUP(Integer articleId, Integer userId);
 
     List<Map<String, Object>> getArticleUPByUser(Integer userId);
+
+    int deleteComment(Integer userId, Integer commentId);
 }

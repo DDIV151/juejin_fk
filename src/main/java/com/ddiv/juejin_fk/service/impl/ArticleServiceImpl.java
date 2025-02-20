@@ -6,6 +6,7 @@ import com.ddiv.juejin_fk.pojo.Article;
 import com.ddiv.juejin_fk.pojo.Comment;
 import com.ddiv.juejin_fk.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class ArticleServiceImpl implements ArticleService {
     ArticleMapper articleMapper;
     @Autowired
     private UserMapper userMapper;
+
+    @Qualifier("articleService")
 
     @Override
     public void addArticleCommend(Comment comment) {
@@ -42,7 +45,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<Map<String, Object>> getArticleUPByUser(Integer userId) {
-       return articleMapper.getArticleUPByUser(userId);
+        return articleMapper.getArticleUPByUser(userId);
+    }
+
+    @Override
+    public int deleteComment(Integer userId, Integer commentId) {
+        Comment comment = articleMapper.getCommentById(commentId);
+        if (comment == null) return 0;
+        if (!comment.getUserId().equals(userId))
+            return 0;
+        return articleMapper.deleteComment(commentId);
     }
 
     @Override
@@ -61,13 +73,20 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public void updateArticle(Article article) {
+    public int updateArticle(Integer userId, Article article) {
+        Integer articleId = article.getArticleId();
+        Integer realUserId = articleMapper.getArticleUser(articleId);
+        if (realUserId != null && !realUserId.equals(userId)) {
+            return 0;
+        }
+        int lines = 0;
         if (article.getArticleTitle() != null) {
-            articleMapper.updateTitle(article.getArticleId(), article.getArticleTitle());
+            lines += articleMapper.updateTitle(articleId, article.getArticleTitle());
         }
         if (article.getArticleContent() != null) {
-            articleMapper.updateContent(article.getArticleId(), article.getArticleContent());
+            lines += articleMapper.updateContent(articleId, article.getArticleContent());
         }
+        return lines;
     }
 
     @Override

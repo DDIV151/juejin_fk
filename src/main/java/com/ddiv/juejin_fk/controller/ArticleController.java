@@ -10,6 +10,7 @@ import com.ddiv.juejin_fk.service.UserService;
 import com.ddiv.juejin_fk.utils.TokenUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,8 @@ public class ArticleController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private HttpServletResponse httpServletResponse;
 
     @PostMapping(value = "/articles/publish")
     public ApiResult<Object> addArticle(@RequestBody Article article, @RequestHeader String token) {
@@ -63,12 +66,18 @@ public class ArticleController {
         return ApiResult.success(200, "查询成功", result);
     }
 
-    @PutMapping("/articles/{article_id}")
-    public ApiResult<Object> updateArticle(@RequestBody Article article) {
-        if (article.getArticleId() != null)
-            if (article.getArticleTitle() != null || article.getArticleContent() != null)
-                articleService.updateArticle(article);
-        return ApiResult.success(200, "修改成功");
+    @PutMapping("/articles/{articleId}")
+    public ApiResult<Object> updateArticle(@RequestBody Article article, @PathVariable Integer articleId, @RequestHeader String token) {
+        int lines = 0;
+        if (article.getArticleTitle() != null || article.getArticleContent() != null) {
+            Integer userId = getID(token);
+            article.setArticleId(articleId);
+            lines = articleService.updateArticle(userId, article);
+        }
+        if (lines > 0)
+            return ApiResult.success(200, "修改成功");
+        httpServletResponse.setStatus(401);
+        return ApiResult.error(401, "修改失败");
     }
 
 
@@ -117,23 +126,35 @@ public class ArticleController {
     }
 
     @GetMapping("/{articleId}/comment")
-    public ApiResult<Object> getArticleCommend(@PathVariable Integer articleId) {
+    public ApiResult<Object> getArticleComment(@PathVariable Integer articleId) {
         return ApiResult.success(200, "获取成功", articleService.getCommendByAID(articleId));
     }
 
     @PostMapping("/{articleId}/comment")
-    public ApiResult<Object> addArticleCommend(@PathVariable Integer articleId, @RequestBody Comment comment, @RequestHeader String token) {
+    public ApiResult<Object> addArticleComment(@PathVariable Integer articleId, @RequestBody Comment comment, @RequestHeader String token) {
         comment.setArticleId(articleId);
         comment.setUserId(getID(token));
         articleService.addArticleCommend(comment);
         return ApiResult.success(200, "评论成功");
     }
 
+    @DeleteMapping("/{commentId}/comment")
+    public ApiResult<Object> deleteArticleComment(@PathVariable Integer commentId, @RequestHeader String token) {
+        Integer userId = getID(token);
+        int line = 0;
+        line = articleService.deleteComment(userId, commentId);
+        if (line == 0) {
+            httpServletResponse.setStatus(402);
+            return ApiResult.error(402, "删除失败");
+        }
+        return ApiResult.success(200, "成功");
+    }
+
     @GetMapping("/articles/unpublish")
     public ApiResult<Object> getArticleUPByUser(@RequestHeader String token) {
         Integer userId = getID(token);
         List<Map<String, Object>> result = articleService.getArticleUPByUser(userId);
-        return ApiResult.success(200,"成功", result);
+        return ApiResult.success(200, "成功", result);
     }
 
 

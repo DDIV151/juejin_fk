@@ -47,10 +47,10 @@ GROUP BY
     void addViews(Integer articleId);
 
     @Update("update juejin_article set article_title=#{articleTitle} where article_id=#{articleId} and is_delete=0")
-    void updateTitle(Integer articleId, String articleTitle);
+    int updateTitle(Integer articleId, String articleTitle);
 
     @Update("update juejin_article set article_content=#{articleContent} where article_id=#{articleId} and is_delete=0")
-    void updateContent(Integer articleId, String articleContent);
+    int updateContent(Integer articleId, String articleContent);
 
     @Update("update juejin_article set is_publish=1-is_publish where article_id=#{articleId} and is_delete=0")
     void publishArticle(Integer articleId);
@@ -79,7 +79,7 @@ GROUP BY
     @Select("select a.article_id,a.article_title,substring(a.article_content,1,30) as article_content,a.article_views,count(star.user_id) as article_likes,a.update_time as article_date,`user`.user_name as article_auther from juejin_article a left join article_star star on a.article_id=star.user_id inner join juejin_user `user` on `user`.user_id=a.user_id and `user`.is_delete=0 where a.is_delete=0 and a.is_publish=1 group by a.article_id, a.article_title, a.article_content, a.article_views, a.update_time, `user`.user_name order by a.update_time desc")
     List<Map<String, Object>> getNewArticles();
 
-    @Select("select user_image,user_name,comment_content from article_comment c inner join juejin_user u on u.user_id=c.user_id and u.is_delete=0 inner join juejin_article a on c.article_id=a.article_id and a.is_delete = 0 where c.is_delete=0 and c.article_id=#{articleId} order by a.update_time desc ")
+    @Select("select c.comment_id,user_image,user_name,comment_content from article_comment c inner join juejin_user u on u.user_id=c.user_id and u.is_delete=0 inner join juejin_article a on c.article_id=a.article_id and a.is_delete = 0 where c.is_delete=0 and c.article_id=#{articleId} order by a.update_time desc ")
     List<Map<String, Object>> getCommendByAID(Integer articleId);
 
     @Insert("insert into article_comment(user_id,article_id,comment_content) values (#{userId},#{articleId},#{commentContent})")
@@ -89,8 +89,17 @@ GROUP BY
     Map<String, Object> ifStar(Integer userId, Integer articleId);
 
     @Select("select u.user_name,a.article_id,a.article_title,a.article_content, count(star.user_id) as article_likes,a.update_time as article_date,a.article_views from juejin_article a left join article_star star on a.article_id=star.article_id and star.is_delete=0 inner join juejin_user u on a.user_id=u.user_id and u.is_delete=0 where a.article_id=#{articleId} and a.is_delete=0 group by a.article_id, u.user_name, a.article_title, a.article_content, a.update_time, a.article_views")
-    Map<String,Object> getArticleUP(Integer articleId);
+    Map<String, Object> getArticleUP(Integer articleId);
 
     @Select("select a.article_id,a.article_title,substring(a.article_content,1,30) as article_content,update_time as article_date from juejin_article a where a.user_id=#{userId} and a.is_delete=0 and a.is_publish=0 group by a.article_id")
     List<Map<String, Object>> getArticleUPByUser(Integer userId);
+
+    @Select("select comment_id,user_id from article_comment where is_delete=0 and comment_id=#{commentId}")
+    Comment getCommentById(Integer commentId);
+
+    @Update("update article_comment set is_delete=1 where comment_id=#{commentId}")
+    int deleteComment(Integer commentId);
+
+    @Select("select user_id from juejin_article where article_id=#{articleId} and is_delete=0")
+    Integer getArticleUser(Integer articleId);
 }
