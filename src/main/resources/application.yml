@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: juejin_fk
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${db.url}
+    username: root
+    password: ddivhutaow1fevki
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+server:
+  port: 8080

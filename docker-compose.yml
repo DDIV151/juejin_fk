@@ -1,0 +1,31 @@
+version: "0.1"
+services:
+  mysql:
+    image: mysql:8.0.33
+    container_name: mysql01
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: juejin
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ddivhutaow1fevki
+    volumes:
+      - "/home/mysql/01/data:/var/lib/mysql"
+    networks:
+      - net01
+  juejin:
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: juejin
+    ports:
+      - "8080:8080"
+    networks:
+      - net01
+    depends_on:
+      - mysql
+networks:
+  net01:
+    driver: bridge

@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class JuejinFkApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(JuejinFkApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(JuejinFkApplication.class, args);
+    }
 
 }
