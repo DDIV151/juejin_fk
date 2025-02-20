@@ -129,5 +129,12 @@ public class ArticleController {
         return ApiResult.success(200, "评论成功");
     }
 
+    @GetMapping("/articles/unpublish")
+    public ApiResult<Object> getArticleUPByUser(@RequestHeader String token) {
+        Integer userId = getID(token);
+        List<Map<String, Object>> result = articleService.getArticleUPByUser(userId);
+        return ApiResult.success(200,"成功", result);
+    }
+
 
 }

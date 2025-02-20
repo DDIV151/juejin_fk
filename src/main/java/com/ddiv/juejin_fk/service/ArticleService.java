@@ -32,4 +32,6 @@ public interface ArticleService {
     boolean ifStar(Integer userId, Integer articleId);
 
     Map<String, Object> getArticleUP(Integer articleId, Integer userId);
+
+    List<Map<String, Object>> getArticleUPByUser(Integer userId);
 }

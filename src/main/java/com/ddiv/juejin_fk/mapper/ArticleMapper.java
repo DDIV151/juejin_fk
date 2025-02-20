@@ -90,4 +90,7 @@ GROUP BY
 
     @Select("select u.user_name,a.article_id,a.article_title,a.article_content, count(star.user_id) as article_likes,a.update_time as article_date,a.article_views from juejin_article a left join article_star star on a.article_id=star.article_id and star.is_delete=0 inner join juejin_user u on a.user_id=u.user_id and u.is_delete=0 where a.article_id=#{articleId} and a.is_delete=0 group by a.article_id, u.user_name, a.article_title, a.article_content, a.update_time, a.article_views")
     Map<String,Object> getArticleUP(Integer articleId);
+
+    @Select("select a.article_id,a.article_title,substring(a.article_content,1,30) as article_content,update_time as article_date from juejin_article a where a.user_id=#{userId} and a.is_delete=0 and a.is_publish=0 group by a.article_id")
+    List<Map<String, Object>> getArticleUPByUser(Integer userId);
 }

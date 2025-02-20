@@ -41,6 +41,11 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public List<Map<String, Object>> getArticleUPByUser(Integer userId) {
+       return articleMapper.getArticleUPByUser(userId);
+    }
+
+    @Override
     public Integer addArticle(Article article) {
         articleMapper.addArticle(article);
         Integer articleId = articleMapper.findLatestArticleIdByUserId(article.getUserId()).get(0).getArticleId();
