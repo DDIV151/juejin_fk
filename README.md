@@ -5,6 +5,7 @@
 
 使用数据库：mysql
 
+````sql
 create table article_comment
 (
     comment_id      int unsigned auto_increment
@@ -53,4 +54,5 @@ create table juejin_user
     is_delete     tinyint unsigned default '0'               not null,
     primary key (user_id, user_name)
 );
+````
 
