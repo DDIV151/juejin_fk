@@ -23,7 +23,7 @@ public class UserController {
     @Autowired
     private HttpServletResponse httpServletResponse;
 
-    @PostMapping("/register")
+    @PostMapping("/api/register")
     public ApiResult<JuejinUser> register(@RequestBody JuejinUser request) {
         if (userService.findByUserName(request.getUserName()) != null) {
             httpServletResponse.setStatus(409);
@@ -33,7 +33,7 @@ public class UserController {
         return ApiResult.success(201, "注册成功", userService.findByUserName(request.getUserName()));
     }
 
-    @PostMapping("/login")
+    @PostMapping("/api/login")
     public ApiResult<Object> login(@RequestBody JuejinUser request) {
         String userName = request.getUserName();
         String userPassword = request.getUserPassword();
@@ -49,7 +49,7 @@ public class UserController {
         return ApiResult.success(200, "登录成功", map);
     }
 
-    @PutMapping(value = "/users/{user_id}/image/upload")
+    @PutMapping(value = "/api/users/{user_id}/image/upload")
     public ApiResult<Object> imageUpload(@PathVariable(name = "user_id") Integer userId, @RequestHeader String token, @RequestBody Map<String, String> image) throws Exception {
         Jws<Claims> claims = TokenUtils.parseToken(token);
         if (!claims.getPayload().get("user_id").equals(userId)) {
@@ -60,7 +60,7 @@ public class UserController {
         return ApiResult.success(200, "修改头像成功");
     }
 
-    @PutMapping(value = "/users/{user_id}/password")
+    @PutMapping(value = "/api/users/{user_id}/password")
     public ApiResult<Object> passwordUpdate(@PathVariable(name = "user_id") Integer userId, @RequestHeader String token, @RequestBody Map<String, String> passwords) {
         Jws<Claims> claims = TokenUtils.parseToken(token);
         if (!claims.getPayload().get("user_id").equals(userId)) {
@@ -75,7 +75,7 @@ public class UserController {
         return ApiResult.success(200, "密码修改成功");
     }
 
-    @GetMapping("users/{userId}/info")
+    @GetMapping("/api/users/{userId}/info")
     public ApiResult<Map<String, Object>> getUserInfo(@PathVariable Integer userId, @RequestHeader String token) {
         Integer realUser = getID(token);
         Map<String, Object> result;
@@ -87,7 +87,7 @@ public class UserController {
         return ApiResult.success(200, "获取成功", result);
     }
 
-    @GetMapping(value = "/{user_id}")
+    @GetMapping(value = "/api/{user_id}")
     public ApiResult<Map> getSimpleUser(@PathVariable(name = "user_id") Integer userId) {
         JuejinUser user = userService.getSimpleUser(userId);
         if (user == null) {
@@ -102,14 +102,14 @@ public class UserController {
         return ApiResult.success(200, "查询成功", map);
     }
 
-    @GetMapping(value = "/users/{user_id}/image")
+    @GetMapping(value = "/api/users/{user_id}/image")
     public ApiResult<Object> getUserImage(@PathVariable(name = "user_id") Integer userId) {
         Map<String, Object> map = new HashMap<>();
         map.put("user_image", userService.getSimpleUser(userId).getUserImage());
         return ApiResult.success(200, "查询成功", map);
     }
 
-    @PutMapping(value = "/users/{user_id}/username")
+    @PutMapping(value = "/api/users/{user_id}/username")
     public ApiResult<Object> updateUserName(@PathVariable(name = "user_id") Integer userId, @RequestHeader String token, @RequestBody Map<String, String> username) {
         Integer realUser = getID(token);
         if (!realUser.equals(userId)) {
@@ -129,7 +129,7 @@ public class UserController {
         return ApiResult.success(200, "成功");
     }
 
-    @DeleteMapping(value = "user/{user_id}/delete")
+    @DeleteMapping(value = "/api/user/{user_id}/delete")
     public ApiResult<Object> deleteUser(@PathVariable(name = "user_id") Integer userId, @RequestBody JuejinUser password) {
         JuejinUser user = userService.findByUserId(userId);
         if (user == null) {

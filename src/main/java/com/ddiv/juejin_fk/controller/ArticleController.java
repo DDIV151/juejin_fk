@@ -28,7 +28,7 @@ public class ArticleController {
     @Autowired
     private HttpServletResponse httpServletResponse;
 
-    @PostMapping(value = "/articles/publish")
+    @PostMapping(value = "/api/articles/publish")
     public ApiResult<Object> addArticle(@RequestBody Article article, @RequestHeader String token) {
         Integer userId = getID(token);
         JuejinUser user = userService.findByUserId(userId);
@@ -42,7 +42,7 @@ public class ArticleController {
         return ApiResult.success(200, "新增文章成功", map);
     }
 
-    @GetMapping("/articles/{articleId}")
+    @GetMapping("/api/articles/{articleId}")
     public Object getArticle(@PathVariable Integer articleId, @RequestHeader String token) {
         Map<String, Object> result = articleService.getArticle(articleId);
         Integer userId = getID(token);
@@ -54,7 +54,7 @@ public class ArticleController {
         return ApiResult.success(200, "查询成功", result);
     }
 
-    @GetMapping("/articles/{articleId}/unpublish")
+    @GetMapping("/api/articles/{articleId}/unpublish")
     public Object getArticleUP(@PathVariable Integer articleId, @RequestHeader String token) {
         Integer userId = getID(token);
         Map<String, Object> result = articleService.getArticleUP(articleId, userId);
@@ -66,7 +66,7 @@ public class ArticleController {
         return ApiResult.success(200, "查询成功", result);
     }
 
-    @PutMapping("/articles/{articleId}")
+    @PutMapping("/api/articles/{articleId}")
     public ApiResult<Object> updateArticle(@RequestBody Article article, @PathVariable Integer articleId, @RequestHeader String token) {
         int lines = 0;
         if (article.getArticleTitle() != null || article.getArticleContent() != null) {
@@ -81,13 +81,13 @@ public class ArticleController {
     }
 
 
-    @PutMapping("/articles/{articleId}/update")
+    @PutMapping("/api/articles/{articleId}/update")
     public ApiResult<Object> publishArticle(@PathVariable Integer articleId) {
         articleService.publishArticle(articleId);
         return ApiResult.success(200, "修改成功");
     }
 
-    @DeleteMapping("/articles/{articleId}/delete")
+    @DeleteMapping("/api/articles/{articleId}/delete")
     public ApiResult<Object> deleteArticle(@PathVariable Integer articleId, @RequestHeader String token) {
         Integer userId = getID(token);
         articleService.deleteArticle(articleId, userId);
@@ -100,21 +100,21 @@ public class ArticleController {
         return userId;
     }
 
-    @PostMapping("/articles/{article_id}/star")
+    @PostMapping("/api/articles/{article_id}/star")
     public ApiResult<Object> addStar(@PathVariable(value = "article_id") Integer articleId, @RequestHeader String token) {
         Integer userId = getID(token);
         articleService.updateStar(userId, articleId);
         return ApiResult.success(200, "成功");
     }
 
-    @DeleteMapping("/articles/{article_id}/star")
+    @DeleteMapping("/api/articles/{article_id}/star")
     public ApiResult<Object> deleteStar(@PathVariable(value = "article_id") Integer articleId, @RequestHeader String token) {
         Integer userId = getID(token);
         articleService.updateStar(userId, articleId);
         return ApiResult.success(200, "成功");
     }
 
-    @GetMapping("/articles")
+    @GetMapping("/api/articles")
     public ApiResult<Object> getArticles(@RequestParam(name = "tags") String tags) {
         List<Map<String, Object>> result = null;
         if (tags.equals("click_down")) {
@@ -125,12 +125,12 @@ public class ArticleController {
         return ApiResult.success(200, "获取成功", result);
     }
 
-    @GetMapping("/{articleId}/comment")
+    @GetMapping("/api/{articleId}/comment")
     public ApiResult<Object> getArticleComment(@PathVariable Integer articleId) {
         return ApiResult.success(200, "获取成功", articleService.getCommendByAID(articleId));
     }
 
-    @PostMapping("/{articleId}/comment")
+    @PostMapping("/api/{articleId}/comment")
     public ApiResult<Object> addArticleComment(@PathVariable Integer articleId, @RequestBody Comment comment, @RequestHeader String token) {
         comment.setArticleId(articleId);
         comment.setUserId(getID(token));
@@ -138,7 +138,7 @@ public class ArticleController {
         return ApiResult.success(200, "评论成功");
     }
 
-    @DeleteMapping("/{commentId}/comment")
+    @DeleteMapping("/api/{commentId}/comment")
     public ApiResult<Object> deleteArticleComment(@PathVariable Integer commentId, @RequestHeader String token) {
         Integer userId = getID(token);
         int line = 0;
@@ -150,7 +150,7 @@ public class ArticleController {
         return ApiResult.success(200, "成功");
     }
 
-    @GetMapping("/articles/unpublish")
+    @GetMapping("/api/articles/unpublish")
     public ApiResult<Object> getArticleUPByUser(@RequestHeader String token) {
         Integer userId = getID(token);
         List<Map<String, Object>> result = articleService.getArticleUPByUser(userId);

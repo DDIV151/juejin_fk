@@ -1,5 +1,18 @@
 version: "0.1"
 services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /home/nginx/dist:/usr/share/nginx/html
+      - /home/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - net01
+    depends_on:
+      - juejin
   juejin:
     stdin_open: true
     tty: true
