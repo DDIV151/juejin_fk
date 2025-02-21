@@ -8,6 +8,11 @@ spring:
     url: ${db.url}
     username: root
     password: ddivhutaow1fevki
+  data:
+    redis:
+      host: redis
+      port: 6379
+      database: 0
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
