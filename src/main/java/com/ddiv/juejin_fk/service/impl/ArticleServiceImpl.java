@@ -96,7 +96,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public void deleteArticle(Integer articleId, Integer userId) {
-        Article article = articleMapper.getArticleInfo(articleId);
+        Article article = articleMapper.ifArticleExist(articleId);
         if (article == null) {
             return;
         }

@@ -55,8 +55,8 @@ GROUP BY
     @Update("update juejin_article set is_publish=1-is_publish where article_id=#{articleId} and is_delete=0")
     void publishArticle(Integer articleId);
 
-    @Select("select article_id,user_id,is_publish from juejin_article where article_id=#{articleId} and is_delete=0 and is_publish=1")
-    Article getArticleInfo(Integer articleId);
+    @Select("select article_id,user_id from juejin_article where article_id=#{articleId} and is_delete=0")
+    Article ifArticleExist(Integer articleId);
 
     @Update("update juejin_article set is_delete=1 where article_id=#{articleId} and is_delete=0")
     void deleteArticle(Integer articleId);
