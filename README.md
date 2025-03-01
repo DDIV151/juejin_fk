@@ -42,7 +42,7 @@ create table juejin_article
     is_delete       tinyint unsigned default '0'               not null
 );
 
-create table juejin_user
+create table juejin.juejin_user
 (
     user_id       int unsigned auto_increment,
     user_name     varchar(20)                                not null,
@@ -52,7 +52,9 @@ create table juejin_user
     create_time   datetime         default CURRENT_TIMESTAMP not null,
     update_time   datetime         default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     is_delete     tinyint unsigned default '0'               not null,
-    primary key (user_id, user_name)
+    primary key (user_id, user_name),
+    constraint juejin_user_pk
+        unique (user_name)
 );
 ````
 
