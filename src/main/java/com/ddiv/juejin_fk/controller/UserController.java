@@ -6,6 +6,7 @@ import com.ddiv.juejin_fk.pojo.JuejinUser;
 import com.ddiv.juejin_fk.service.UserService;
 import com.ddiv.juejin_fk.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class UserController {
     private final UserService userService;
     private final HttpServletResponse httpServletResponse;
 
+    @Autowired
     public UserController(UserService userService, HttpServletResponse httpServletResponse) {
         this.userService = userService;
         this.httpServletResponse = httpServletResponse;

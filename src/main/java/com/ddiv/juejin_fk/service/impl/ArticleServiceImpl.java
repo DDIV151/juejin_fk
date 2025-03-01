@@ -16,17 +16,21 @@ import java.util.Map;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
-    final
-    ArticleMapper articleMapper;
+    private final ArticleMapper articleMapper;
     private final UserMapper userMapper;
+    private final RedisTemplate<String,Object> redisTemplate;
 
+    // Redis 键名常量
+    private static final String HOT_ARTICLES_KEY = "hot:articles";
+    private static final String NEW_ARTICLES_KEY = "new:articles";
+    private static final long CACHE_TIMEOUT = 30; // 缓存过期时间（分钟）
 
-    public ArticleServiceImpl(ArticleMapper articleMapper, UserMapper userMapper) {
+    @Autowired
+    public ArticleServiceImpl(ArticleMapper articleMapper, UserMapper userMapper,RedisTemplate<String,Object> redisTemplate) {
         this.articleMapper = articleMapper;
         this.userMapper = userMapper;
+        this.redisTemplate = redisTemplate;
     }
-
-    @Qualifier("articleService")
 
     @Override
     public void addArticleCommend(Comment comment) {
@@ -129,9 +133,13 @@ public class ArticleServiceImpl implements ArticleService {
         return articleMapper.getNewArticles();
     }
 
+
     @Override
     public List<Map<String, Object>> getCommendByAID(Integer articleId) {
         return articleMapper.getCommendByAID(articleId);
     }
 
+    public RedisTemplate<String, Object> getRedisTemplate() {
+        return redisTemplate;
+    }
 }
