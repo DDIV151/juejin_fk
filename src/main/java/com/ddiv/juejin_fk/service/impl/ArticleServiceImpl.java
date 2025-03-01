@@ -5,8 +5,8 @@ import com.ddiv.juejin_fk.mapper.UserMapper;
 import com.ddiv.juejin_fk.pojo.Article;
 import com.ddiv.juejin_fk.pojo.Comment;
 import com.ddiv.juejin_fk.service.ArticleService;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -70,8 +70,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Integer addArticle(Article article) {
         articleMapper.addArticle(article);
-        Integer articleId = articleMapper.findLatestArticleIdByUserId(article.getUserId()).get(0).getArticleId();
-        return articleId;
+        return articleMapper.findLatestArticleIdByUserId(article.getUserId()).get(0).getArticleId();
     }
 
     @Override
@@ -137,9 +136,5 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Map<String, Object>> getCommendByAID(Integer articleId) {
         return articleMapper.getCommendByAID(articleId);
-    }
-
-    public RedisTemplate<String, Object> getRedisTemplate() {
-        return redisTemplate;
     }
 }

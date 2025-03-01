@@ -5,8 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 @Configuration
 public class RedisConfig {
@@ -22,13 +21,14 @@ public class RedisConfig {
         template.setConnectionFactory(factory);
 
         // Key 序列化器（String）
-        StringRedisSerializer stringSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer<Object> stringSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
 
         // Value 序列化器（JSON）
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        template.setValueSerializer(jsonSerializer);
+        template.setHashValueSerializer(jsonSerializer);
 
         template.afterPropertiesSet();
         return template;
