@@ -7,6 +7,7 @@ import com.ddiv.juejin_fk.pojo.Comment;
 import com.ddiv.juejin_fk.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +16,15 @@ import java.util.Map;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
-    @Autowired
+    final
     ArticleMapper articleMapper;
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
+
+
+    public ArticleServiceImpl(ArticleMapper articleMapper, UserMapper userMapper) {
+        this.articleMapper = articleMapper;
+        this.userMapper = userMapper;
+    }
 
     @Qualifier("articleService")
 
@@ -127,4 +133,5 @@ public class ArticleServiceImpl implements ArticleService {
     public List<Map<String, Object>> getCommendByAID(Integer articleId) {
         return articleMapper.getCommendByAID(articleId);
     }
+
 }

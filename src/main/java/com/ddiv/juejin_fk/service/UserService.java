@@ -3,13 +3,12 @@ package com.ddiv.juejin_fk.service;
 import com.ddiv.juejin_fk.pojo.JuejinUser;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
 public interface UserService {
 
-    void register(JuejinUser request) ;
+    JuejinUser register(JuejinUser request) ;
 
     JuejinUser findByUserName(String userName);
 
@@ -21,11 +20,13 @@ public interface UserService {
 
     JuejinUser getSimpleUser(Integer userId);
 
-    void deleteUser(Integer userId);
+    void deleteUser(JuejinUser user);
 
     Map<String, Object> getSelfInfo(Integer userId);
 
     Map<String, Object> getUserInfo(Integer userId);
 
     void updateUserName(JuejinUser user);
+
+    JuejinUser login(JuejinUser request);
 }

@@ -1,13 +1,11 @@
 package com.ddiv.juejin_fk.controller;
 
+import com.ddiv.juejin_fk.exception.UnauthorizedException;
 import com.ddiv.juejin_fk.pojo.ApiResult;
 import com.ddiv.juejin_fk.pojo.JuejinUser;
 import com.ddiv.juejin_fk.service.UserService;
 import com.ddiv.juejin_fk.utils.TokenUtils;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,32 +16,34 @@ import static com.ddiv.juejin_fk.controller.ArticleController.getID;
 @RestController
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private HttpServletResponse httpServletResponse;
+    private final UserService userService;
+    private final HttpServletResponse httpServletResponse;
+
+    public UserController(UserService userService, HttpServletResponse httpServletResponse) {
+        this.userService = userService;
+        this.httpServletResponse = httpServletResponse;
+    }
 
     @PostMapping("/api/register")
     public ApiResult<JuejinUser> register(@RequestBody JuejinUser request) {
-        if (userService.findByUserName(request.getUserName()) != null) {
-            httpServletResponse.setStatus(409);
-            return ApiResult.error(409, "用户名已被占用");
-        }
-        userService.register(request);
-        return ApiResult.success(201, "注册成功", userService.findByUserName(request.getUserName()));
+        JuejinUser user = userService.register(request);
+        if (user != null)
+            return ApiResult.success(201, "注册成功", user);
+        httpServletResponse.setStatus(409);
+        return ApiResult.error(409, "用户名已被占用");
     }
 
     @PostMapping("/api/login")
     public ApiResult<Object> login(@RequestBody JuejinUser request) {
-        String userName = request.getUserName();
-        String userPassword = request.getUserPassword();
-        JuejinUser user = userService.findByUserName(userName);
-        if (user == null || !userPassword.equals(user.getUserPassword())) {
-            httpServletResponse.setStatus(401);
-            return ApiResult.error(401, "用户名或密码错误");
-        }
+//        String userName = request.getUserName();
+//        String userPassword = request.getUserPassword();
+//        if (user == null || !userPassword.equals(user.getUserPassword())) {
+//            httpServletResponse.setStatus(401);
+//            return ApiResult.error(401, "用户名或密码错误");
+//        }
+        JuejinUser user = userService.login(request);
         Map<Object, Object> map = new HashMap<>();
-        map.put("user_name", userName);
+        map.put("user_name", user.getUserName());
         map.put("user_id", user.getUserId());
         map.put("token", TokenUtils.generateToken(user, 0));
         return ApiResult.success(200, "登录成功", map);
@@ -51,10 +51,8 @@ public class UserController {
 
     @PutMapping(value = "/api/users/{user_id}/image/upload")
     public ApiResult<Object> imageUpload(@PathVariable(name = "user_id") Integer userId, @RequestHeader String token, @RequestBody Map<String, String> image) throws Exception {
-        Jws<Claims> claims = TokenUtils.parseToken(token);
-        if (!claims.getPayload().get("user_id").equals(userId)) {
-            httpServletResponse.setStatus(401);
-            return ApiResult.error(401, "非法请求，禁止修改他人数据");
+        if (!getID(token).equals(userId)) {
+            throw new UnauthorizedException("非法请求，禁止修改他人数据");
         }
         userService.updateImage(userId, image.get("avater_base64"));
         return ApiResult.success(200, "修改头像成功");
@@ -62,10 +60,8 @@ public class UserController {
 
     @PutMapping(value = "/api/users/{user_id}/password")
     public ApiResult<Object> passwordUpdate(@PathVariable(name = "user_id") Integer userId, @RequestHeader String token, @RequestBody Map<String, String> passwords) {
-        Jws<Claims> claims = TokenUtils.parseToken(token);
-        if (!claims.getPayload().get("user_id").equals(userId)) {
-            httpServletResponse.setStatus(401);
-            return ApiResult.error(401, "非法请求，禁止修改他人数据");
+        if (!getID(token).equals(userId)) {
+            throw new UnauthorizedException("非法请求，禁止修改他人数据");
         }
         JuejinUser user = userService.findByUserId(userId);
         if (!user.getUserPassword().equals(passwords.get("pre_password"))) {
@@ -88,12 +84,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/api/{user_id}")
-    public ApiResult<Map> getSimpleUser(@PathVariable(name = "user_id") Integer userId) {
+    public ApiResult<Map<String, Object>> getSimpleUser(@PathVariable(name = "user_id") Integer userId) {
         JuejinUser user = userService.getSimpleUser(userId);
-        if (user == null) {
-            httpServletResponse.setStatus(401);
-            return ApiResult.error(401, "用户不存在");
-        }
         Map<String, Object> map = new HashMap<>();
         map.put("user_id", user.getUserId());
         map.put("user_name", user.getUserName());
@@ -111,18 +103,16 @@ public class UserController {
 
     @PutMapping(value = "/api/users/{user_id}/username")
     public ApiResult<Object> updateUserName(@PathVariable(name = "user_id") Integer userId, @RequestHeader String token, @RequestBody Map<String, String> username) {
-        Integer realUser = getID(token);
-        if (!realUser.equals(userId)) {
-            httpServletResponse.setStatus(401);
-            return ApiResult.error(401, "不能修改他人用户名");
+        if (!getID(token).equals(userId)) {
+            throw new UnauthorizedException("非法请求，禁止修改他人数据");
         }
         String userName = username.get("user_name");
-        JuejinUser user = userService.findByUserName(userName);
-        if (user != null) {
-            httpServletResponse.setStatus(409);
-            return ApiResult.error(409, "用户名重复");
-        }
-        user = new JuejinUser();
+//        JuejinUser user = userService.findByUserName(userName);
+//        if (user != null) {
+//            httpServletResponse.setStatus(409);
+//            return ApiResult.error(409, "用户名重复");
+//        }
+        JuejinUser user = new JuejinUser();
         user.setUserName(userName);
         user.setUserId(userId);
         userService.updateUserName(user);
@@ -130,17 +120,22 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/api/user/{user_id}/delete")
-    public ApiResult<Object> deleteUser(@PathVariable(name = "user_id") Integer userId, @RequestBody JuejinUser password) {
-        JuejinUser user = userService.findByUserId(userId);
-        if (user == null) {
-            httpServletResponse.setStatus(401);
-            return ApiResult.error(401, "用户不存在");
+    public ApiResult<Object> deleteUser(@PathVariable(name = "user_id") Integer userId, @RequestBody JuejinUser password, @RequestHeader String token) {
+        if (!getID(token).equals(userId)) {
+            throw new UnauthorizedException("非法请求，禁止修改他人数据");
         }
-        if (!user.getUserPassword().equals(password.getUserPassword())) {
-            httpServletResponse.setStatus(402);
-            return ApiResult.error(402, "密码错误");
-        }
-        userService.deleteUser(userId);
+        JuejinUser user = new JuejinUser();
+        user.setUserId(userId);
+        user.setUserPassword(password.getUserPassword());
+//        if (user == null) {
+//            httpServletResponse.setStatus(401);
+//            return ApiResult.error(401, "用户不存在");
+//        }
+//        if (!user.getUserPassword().equals(password.getUserPassword())) {
+//            httpServletResponse.setStatus(402);
+//            return ApiResult.error(402, "密码错误");
+//        }
+        userService.deleteUser(user);
         return ApiResult.success(200, "成功注销");
     }
 

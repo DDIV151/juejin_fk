@@ -1,13 +1,18 @@
 spring:
   profiles:
-    active: dev
+    active: local
   application:
     name: juejin_fk
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${db.url}
+    url: ${db.mysql.url}
     username: root
     password: ddivhutaow1fevki
+  data:
+    redis:
+      host: ${db.redis.host}
+      port: 6379
+      database: 0
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

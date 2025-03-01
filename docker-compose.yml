@@ -7,8 +7,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/nginx/dist:/usr/share/nginx/html
-      - /home/nginx/conf.d:/etc/nginx/conf.d
+      - "/home/nginx/dist:/usr/share/nginx/html"
+      - "/home/nginx/conf.d:/etc/nginx/conf.d"
     networks:
       - net01
     depends_on:
@@ -45,6 +45,10 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - "/home/redis/data:/data"
+      - "/home/redis/conf/redis.conf:/usr/local/etc/redis/redis.conf"
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
     networks:
       - net01
 networks:

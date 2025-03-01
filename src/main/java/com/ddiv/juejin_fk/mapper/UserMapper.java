@@ -3,9 +3,6 @@ package com.ddiv.juejin_fk.mapper;
 import com.ddiv.juejin_fk.pojo.JuejinUser;
 import org.apache.ibatis.annotations.*;
 
-import java.util.List;
-import java.util.Map;
-
 @Mapper
 public interface UserMapper {
 
@@ -26,7 +23,7 @@ public interface UserMapper {
      * @return
      */
     @Insert("insert into juejin_user(user_name,user_password) values (#{userName},#{userPassword}) ")
-    void insertUser(JuejinUser juejinUser);
+    int insertUser(JuejinUser juejinUser);
 
     @Update("update juejin_user set user_image = #{image} where user_id = #{userId}")
     void updateUserImage(Integer userId, String image);

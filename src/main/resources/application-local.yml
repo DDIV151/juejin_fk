@@ -1,2 +1,5 @@
 db:
-  url: jdbc:mysql://localhost:3306/juejin?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+  mysql:
+   url: jdbc:mysql://localhost:3306/juejin?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+  redis:
+    host: localhost
